@@ -13,7 +13,7 @@ export default [
     { key: '0', code: 'Digit0' },
     { key: '-', code: 'Minus' },
     { key: '=', code: 'Equal' },
-    { key: 'Backspace', code: 'Backspace' },
+    { key: 'Backspace', code: 'Backspace', className: 'key--2w' },
   ],
   [
     { key: 'Tab', code: 'Tab' },
@@ -32,7 +32,7 @@ export default [
     { key: 'Delete', code: 'NumpadDecimal' },
   ],
   [
-    { key: 'CapsLock', code: 'CapsLock' },
+    { key: 'CapsLock', code: 'CapsLock', className: 'key--2w' },
     { key: 'a', code: 'KeyA' },
     { key: 's', code: 'KeyS' },
     { key: 'd', code: 'KeyD' },
@@ -45,10 +45,10 @@ export default [
     { key: ';', code: 'Semicolon' },
     { key: '\'', code: 'Quote' },
     { key: '\\', code: 'Backslash' },
-    { key: 'Enter', code: 'KeyI' },
+    { key: 'Enter', code: 'Enter', className: 'key--2w' },
   ],
   [
-    { key: 'Shift', code: 'ShiftLeft' },
+    { key: 'Shift', code: 'ShiftLeft', className: 'key--2w' },
     { key: 'z', code: 'KeyZ' },
     { key: 'x', code: 'KeyX' },
     { key: 'c', code: 'KeyC' },
@@ -60,7 +60,7 @@ export default [
     { key: '.', code: 'Period' },
     { key: '/', code: 'Slash' },
     { key: 'ArrowUp', code: 'ArrowUp' },
-    { key: 'Shift', code: 'ShiftLeft' },
+    { key: 'Shift', code: 'ShiftLeft', className: 'key--2w' },
   ],
   [
     { key: 'Ctrl', code: 'ControlLeft' },
