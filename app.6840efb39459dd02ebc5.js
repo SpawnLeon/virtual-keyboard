@@ -46,9 +46,7 @@ class Keyboard {
     this.lines = lines;
     this.elements = {
       keyboardWrapper: null
-    }; // setInterval(() => {
-    //   console.log(this.state);
-    // }, 1000);
+    };
   }
 
   init() {
@@ -79,7 +77,7 @@ class Keyboard {
         code
       } = detail;
       const keyData = this.allKeys.find(k => k.code === code);
-      this.pressKeyHandler(keyData);
+      this.pressKeyHandler(keyData, evt);
     });
     document.addEventListener('mouseKeyUp', evt => {
       evt.preventDefault();
@@ -94,29 +92,14 @@ class Keyboard {
     });
   }
 
-  toggleLanguage(evt) {
+  toggleLanguage() {
     const lang = this.state.lang === 'eng' ? 'rus' : 'eng';
     this.state.lang = lang;
     window.localStorage.setItem('lang', lang);
   }
 
-  rendersCapslockKeys() {
-    this.allKeyElements.forEach(element => {
-      const key = element;
-
-      if (!key.customData.isCapsLocking) {
-        return;
-      }
-
-      if (this.state.isCapsLock) {
-        key.textContent = key.textContent.toUpperCase();
-      } else {
-        key.textContent = key.textContent.toLowerCase();
-      }
-    });
-  }
-
   renderKeyboard() {
+    this.allKeyElements = [];
     this.elements.keyboardWrapper.innerHTML = '';
     const keyboard = document.createElement('div');
     keyboard.classList.add('keyboard');
@@ -180,21 +163,33 @@ class Keyboard {
       btn.classList.add(keyData.className);
     }
 
+    if (keyData.code === 'CapsLock') {
+      if (this.state.isCapsLock) {
+        btn.classList.add('key--active');
+      } else {
+        btn.classList.remove('key--active');
+      }
+    }
+
     btn.type = 'button';
     btn.dataset.keyCode = keyData.code;
     btn.textContent = this.getChar(keyData);
-    btn.addEventListener('mousedown', () => {
+    btn.addEventListener('mousedown', evt => {
       const mouseKeyDown = new CustomEvent('mouseKeyDown', {
         detail: {
-          code: keyData.code
+          code: keyData.code,
+          ctrlKey: evt.ctrlKey,
+          shiftKey: evt.shiftKey
         }
       });
       document.dispatchEvent(mouseKeyDown);
     });
-    btn.addEventListener('mouseup', () => {
+    btn.addEventListener('mouseup', evt => {
       const mouseKeyUp = new CustomEvent('mouseKeyUp', {
         detail: {
-          code: keyData.code
+          code: keyData.code,
+          ctrlKey: evt.ctrlKey,
+          shiftKey: evt.shiftKey
         }
       });
       document.dispatchEvent(mouseKeyUp);
@@ -208,8 +203,6 @@ class Keyboard {
     }
 
     const start = this.entryField.selectionStart;
-    const currentKey = this.allKeyElements.find(key => key.dataset.keyCode === keyData.code);
-    currentKey.classList.add('key--active');
     const {
       code: keyCode
     } = keyData;
@@ -268,25 +261,29 @@ class Keyboard {
 
       case 'AltLeft':
       case 'AltRight':
-        console.log('alt');
         break;
 
       case 'MetaLeft':
       case 'MetaRight':
-        console.log('win/meta');
         break;
 
       case 'CapsLock':
         this.state.isCapsLock = !this.state.isCapsLock;
-        this.rendersCapslockKeys();
+        this.renderKeyboard();
         break;
 
       default:
         this.printChar(this.getChar(keyData));
     }
+
+    const currentKey = this.allKeyElements.find(key => key.dataset.keyCode === keyData.code);
+
+    if (currentKey.customData.code !== 'CapsLock') {
+      currentKey.classList.add('key--active');
+    }
   }
 
-  releaseHandler(keyData, evt) {
+  releaseHandler(keyData) {
     if (!keyData) {
       return;
     }
@@ -306,18 +303,23 @@ class Keyboard {
       default:
     }
 
-    if (currentKey.customData.code === 'CapsLock') {
-      if (!this.state.isCapsLock) {
-        currentKey.classList.remove('key--active');
-      }
-    } else {
+    if (currentKey.customData.code !== 'CapsLock') {
       currentKey.classList.remove('key--active');
     }
   }
 
   getChar(keyData) {
     const charData = keyData[this.state.lang];
-    const char = charData.lower;
+    let char = charData.lower;
+
+    if (this.state.isShiftPressed) {
+      char = charData.upper;
+    }
+
+    if (this.state.isCapsLock) {
+      char = charData.upper;
+    }
+
     return char;
   }
 
@@ -1370,4 +1372,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=app.8ca86a1afb2fe29d073a.js.map
+//# sourceMappingURL=app.6840efb39459dd02ebc5.js.map
