@@ -1,9 +1,9 @@
 export default class Keyboard {
-  constructor(lines) {
+  constructor(lines, lang) {
     this.state = {
       isShiftPressed: false,
       isCapsLock: false,
-      isEnLang: true,
+      lang,
     };
     this.entryField = null;
     this.allKeys = lines.flat();
@@ -24,12 +24,11 @@ export default class Keyboard {
     this.renderKeyboard();
 
     document.addEventListener('keydown', (evt) => {
-      console.log(evt);
       evt.preventDefault();
       const { code } = evt;
       const keyData = this.allKeys.find((k) => k.code === code);
 
-      this.pressKeyHandler(keyData);
+      this.pressKeyHandler(keyData, evt);
     });
 
     document.addEventListener('keyup', (evt) => {
@@ -54,6 +53,12 @@ export default class Keyboard {
       const keyData = this.allKeys.find((k) => k.code === code);
       this.releaseHandler(keyData);
     });
+  }
+
+  toggleLanguage(evt) {
+    const lang = this.state.lang === 'eng' ? 'rus' : 'eng';
+    this.state.lang = lang;
+    window.localStorage.setItem('lang', lang);
   }
 
   rendersCapslockKeys() {
@@ -145,7 +150,10 @@ export default class Keyboard {
 
     btn.type = 'button';
     btn.dataset.keyCode = keyData.code;
-    btn.textContent = keyData.key;
+
+    const langKey = keyData[this.state.lang]?.key || keyData.key;
+
+    btn.textContent = langKey;
 
     btn.addEventListener('mousedown', () => {
       const mouseKeyDown = new CustomEvent('mouseKeyDown', {
@@ -168,14 +176,16 @@ export default class Keyboard {
     return btn;
   }
 
-  pressKeyHandler(keyData) {
+  pressKeyHandler(keyData, evt) {
     if (!keyData) { return; }
+
+    const start = this.entryField.selectionStart;
 
     const currentKey = this.allKeyElements.find((key) => key.dataset.keyCode === keyData.code);
     currentKey.classList.add('key--active');
 
-    const start = this.entryField.selectionStart;
-    const { key: char, code: keyCode } = keyData;
+    const { code: keyCode } = keyData;
+    const { key: char } = keyData[this.state.lang] || keyData;
 
     let newChar = char;
     if (this.state.isShiftPressed) {
@@ -213,7 +223,21 @@ export default class Keyboard {
         break;
       case 'ShiftLeft':
       case 'ShiftRight':
-        this.state.isShiftPressed = true;
+        if (evt.ctrlKey && evt.shiftKey) {
+          this.toggleLanguage(evt);
+          this.renderKeyboard();
+        } else {
+          this.state.isShiftPressed = true;
+        }
+
+        break;
+
+      case 'ControlLeft':
+      case 'ControlRight':
+        if (evt.ctrlKey && evt.shiftKey) {
+          this.toggleLanguage(evt);
+          this.renderKeyboard();
+        }
         break;
 
       case 'AltLeft':
@@ -230,10 +254,7 @@ export default class Keyboard {
         this.state.isCapsLock = !this.state.isCapsLock;
         this.rendersCapslockKeys();
         break;
-      case 'ControlLeft':
-      case 'ControlRight':
-        console.log('Control');
-        break;
+
       default:
         this.printChar(newChar);
     }

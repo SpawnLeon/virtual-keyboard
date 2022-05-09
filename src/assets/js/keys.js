@@ -1,6 +1,6 @@
 export default [
   [
-    { key: '`', code: 'Backquote' },
+    { eng: { key: '`' }, rus: { key: 'ё' }, code: 'Backquote' },
     { key: '1', code: 'Digit1', key2: '!' },
     { key: '2', code: 'Digit2', key2: '@' },
     { key: '3', code: 'Digit3', key2: '#' },
@@ -17,50 +17,104 @@ export default [
   ],
   [
     { key: 'Tab', code: 'Tab', className: 'key--1-5w' },
-    { key: 'q', code: 'KeyQ', isCapsLocking: true },
-    { key: 'w', code: 'KeyW', isCapsLocking: true },
-    { key: 'e', code: 'KeyE', isCapsLocking: true },
-    { key: 'r', code: 'KeyR', isCapsLocking: true },
-    { key: 't', code: 'KeyT', isCapsLocking: true },
-    { key: 'y', code: 'KeyY', isCapsLocking: true },
-    { key: 'u', code: 'KeyU', isCapsLocking: true },
-    { key: 'i', code: 'KeyI', isCapsLocking: true },
-    { key: 'o', code: 'KeyO', isCapsLocking: true },
-    { key: 'p', code: 'KeyP', isCapsLocking: true },
-    { key: '[', code: 'BracketLeft' },
-    { key: ']', code: 'BracketRight' },
+
+    {
+      eng: { key: 'q' }, rus: { key: 'й' }, code: 'KeyQ', isCapsLocking: true,
+    },
+
+    {
+      eng: { key: 'w' }, rus: { key: 'ц' }, code: 'KeyW', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'e' }, rus: { key: 'у' }, code: 'KeyE', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'r' }, rus: { key: 'к' }, code: 'KeyR', isCapsLocking: true,
+    },
+    {
+      eng: { key: 't' }, rus: { key: 'е' }, code: 'KeyT', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'y' }, rus: { key: 'н' }, code: 'KeyY', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'u' }, rus: { key: 'г' }, code: 'KeyU', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'i' }, rus: { key: 'ш' }, code: 'KeyI', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'o' }, rus: { key: 'щ' }, code: 'KeyO', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'p' }, rus: { key: 'з' }, code: 'KeyP', isCapsLocking: true,
+    },
+    { eng: { key: '[' }, rus: { key: 'х' }, code: 'BracketLeft' },
+    { eng: { key: ']' }, rus: { key: 'ъ' }, code: 'BracketRight' },
     { key: 'Delete', code: 'Delete', className: 'key--1-5w' },
   ],
   [
     {
       key: 'CapsLock', code: 'CapsLock', className: 'key--1-5w', isCapsLock: true,
     },
-    { key: 'a', code: 'KeyA', isCapsLocking: true },
-    { key: 's', code: 'KeyS', isCapsLocking: true },
-    { key: 'd', code: 'KeyD', isCapsLocking: true },
-    { key: 'f', code: 'KeyF', isCapsLocking: true },
-    { key: 'g', code: 'KeyG', isCapsLocking: true },
-    { key: 'h', code: 'KeyH', isCapsLocking: true },
-    { key: 'j', code: 'KeyJ', isCapsLocking: true },
-    { key: 'k', code: 'KeyK', isCapsLocking: true },
-    { key: 'l', code: 'KeyL', isCapsLocking: true },
-    { key: ';', code: 'Semicolon' },
-    { key: '\'', code: 'Quote' },
-    { key: '\\', code: 'Backslash' },
+    {
+      eng: { key: 'a' }, rus: { key: 'ф' }, code: 'KeyA', isCapsLocking: true,
+    },
+    {
+      eng: { key: 's' }, rus: { key: 'ы' }, code: 'KeyS', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'd' }, rus: { key: 'в' }, code: 'KeyD', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'f' }, rus: { key: 'а' }, code: 'KeyF', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'g' }, rus: { key: 'п' }, code: 'KeyG', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'h' }, rus: { key: 'р' }, code: 'KeyH', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'j' }, rus: { key: 'о' }, code: 'KeyJ', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'k' }, rus: { key: 'л' }, code: 'KeyK', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'l' }, rus: { key: 'д' }, code: 'KeyL', isCapsLocking: true,
+    },
+    { eng: { key: ';' }, rus: { key: 'ж' }, code: 'Semicolon' },
+    { eng: { key: '\'' }, rus: { key: 'э' }, code: 'Quote' },
+    { eng: { key: '\\' }, rus: { key: '\\' }, code: 'Backslash' },
     { key: 'Enter', code: 'Enter', className: 'key--1-5w' },
   ],
   [
     { key: 'Shift', code: 'ShiftLeft', className: 'key--2w' },
-    { key: 'z', code: 'KeyZ', isCapsLocking: true },
-    { key: 'x', code: 'KeyX', isCapsLocking: true },
-    { key: 'c', code: 'KeyC', isCapsLocking: true },
-    { key: 'v', code: 'KeyV', isCapsLocking: true },
-    { key: 'b', code: 'KeyB', isCapsLocking: true },
-    { key: 'n', code: 'KeyN', isCapsLocking: true },
-    { key: 'm', code: 'KeyM', isCapsLocking: true },
-    { key: ',', code: 'Comma' },
-    { key: '.', code: 'Period' },
-    { key: '/', code: 'Slash' },
+    {
+      eng: { key: 'z' }, rus: { key: 'я' }, code: 'KeyZ', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'x' }, rus: { key: 'ч' }, code: 'KeyX', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'c' }, rus: { key: 'с' }, code: 'KeyC', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'v' }, rus: { key: 'м' }, code: 'KeyV', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'b' }, rus: { key: 'и' }, code: 'KeyB', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'n' }, rus: { key: 'т' }, code: 'KeyN', isCapsLocking: true,
+    },
+    {
+      eng: { key: 'm' }, rus: { key: 'ь' }, code: 'KeyM', isCapsLocking: true,
+    },
+    { eng: { key: ',' }, rus: { key: 'б' }, code: 'Comma' },
+    { eng: { key: '.' }, rus: { key: 'ю' }, code: 'Period' },
+    { eng: { key: '/' }, rus: { key: '.' }, code: 'Slash' },
     { key: '▲', code: 'ArrowUp' },
     { key: 'Shift', code: 'ShiftRight', className: 'key--2w' },
   ],
