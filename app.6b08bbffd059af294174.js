@@ -42,14 +42,19 @@ class Keyboard {
     this.entryField = null;
     this.allKeys = lines.flat();
     this.allKeyElements = [];
-    this.lines = lines; // setInterval(() => {
+    this.lines = lines;
+    this.elements = {
+      keyboardWrapper: null
+    }; // setInterval(() => {
     //   console.log(this.state);
     // }, 1000);
   }
 
   init() {
     this.render();
+    this.renderKeyboard();
     document.addEventListener('keydown', evt => {
+      console.log(evt);
       evt.preventDefault();
       const {
         code
@@ -89,6 +94,30 @@ class Keyboard {
     });
   }
 
+  rendersCapslockKeys() {
+    this.allKeyElements.forEach(element => {
+      const key = element;
+
+      if (!key.customData.isCapsLocking) {
+        return;
+      }
+
+      if (this.state.isCapsLock) {
+        key.textContent = key.textContent.toUpperCase();
+      } else {
+        key.textContent = key.textContent.toLowerCase();
+      }
+    });
+  }
+
+  renderKeyboard() {
+    this.elements.keyboardWrapper.innerHTML = '';
+    const keyboard = document.createElement('div');
+    keyboard.classList.add('keyboard');
+    keyboard.append(...this.renderKeyLines(this.lines));
+    this.elements.keyboardWrapper.append(keyboard);
+  }
+
   printChar(char) {
     this.entryField.value += char;
   }
@@ -106,19 +135,20 @@ class Keyboard {
     entryField.rows = 10;
     entryFieldWrapper.append(entryField);
     this.entryField = entryField;
-    const keyboard = document.createElement('div');
-    keyboard.classList.add('keyboard');
-    keyboard.append(...this.renderKeyLines(this.keyLines));
+    const keyboardWrapper = document.createElement('div');
+    keyboardWrapper.classList.add('keyboard-wrapper');
+    this.elements.keyboardWrapper = keyboardWrapper;
     const text = document.createElement('div');
     text.classList.add('text');
-    text.innerHTML = `<br>
+    text.innerHTML = `
       Клавиатура создана в операционной системе Windows <br>
       Для переключения языка комбинация: левые shift + ctrl`;
     app.append(entryFieldWrapper);
-    app.append(keyboard);
     app.append(text);
+    app.append(keyboardWrapper);
     container.append(app);
     document.body.append(container);
+    this.elements.keyboardWrapper = keyboardWrapper;
     return entryField;
   }
 
@@ -137,18 +167,11 @@ class Keyboard {
 
   renderKey(keyData) {
     const btn = document.createElement('button');
+    btn.customData = keyData;
     btn.classList.add('keyboard__key', 'key');
 
     if (keyData.className) {
       btn.classList.add(keyData.className);
-    }
-
-    if (this.state.currentKeyCode === keyData.key) {
-      btn.classList.remove('key--active');
-    }
-
-    if (this.state.isCapsLock) {
-      btn.classList.remove('key--active');
     }
 
     btn.type = 'button';
@@ -236,8 +259,14 @@ class Keyboard {
         console.log('alt');
         break;
 
+      case 'MetaLeft':
+      case 'MetaRight':
+        console.log('win/meta');
+        break;
+
       case 'CapsLock':
         this.state.isCapsLock = !this.state.isCapsLock;
+        this.rendersCapslockKeys();
         break;
 
       case 'ControlLeft':
@@ -255,11 +284,15 @@ class Keyboard {
       return;
     }
 
-    const {
-      code: keyCode
-    } = keyData;
-    const pressedKey = document.querySelector(`[data-key-code="${keyCode}"]`);
-    pressedKey.classList.remove('key--active');
+    const currentKey = this.allKeyElements.find(key => key.dataset.keyCode === keyData.code);
+
+    if (currentKey.customData.code === 'CapsLock') {
+      if (!this.state.isCapsLock) {
+        currentKey.classList.remove('key--active');
+      }
+    } else {
+      currentKey.classList.remove('key--active');
+    }
   }
 
 }
@@ -337,34 +370,44 @@ __webpack_require__.r(__webpack_exports__);
   className: 'key--1-5w'
 }, {
   key: 'q',
-  code: 'KeyQ'
+  code: 'KeyQ',
+  isCapsLocking: true
 }, {
   key: 'w',
-  code: 'KeyW'
+  code: 'KeyW',
+  isCapsLocking: true
 }, {
   key: 'e',
-  code: 'KeyE'
+  code: 'KeyE',
+  isCapsLocking: true
 }, {
   key: 'r',
-  code: 'KeyR'
+  code: 'KeyR',
+  isCapsLocking: true
 }, {
   key: 't',
-  code: 'KeyT'
+  code: 'KeyT',
+  isCapsLocking: true
 }, {
   key: 'y',
-  code: 'KeyY'
+  code: 'KeyY',
+  isCapsLocking: true
 }, {
   key: 'u',
-  code: 'KeyU'
+  code: 'KeyU',
+  isCapsLocking: true
 }, {
   key: 'i',
-  code: 'KeyI'
+  code: 'KeyI',
+  isCapsLocking: true
 }, {
   key: 'o',
-  code: 'KeyO'
+  code: 'KeyO',
+  isCapsLocking: true
 }, {
   key: 'p',
-  code: 'KeyP'
+  code: 'KeyP',
+  isCapsLocking: true
 }, {
   key: '[',
   code: 'BracketLeft'
@@ -382,31 +425,40 @@ __webpack_require__.r(__webpack_exports__);
   isCapsLock: true
 }, {
   key: 'a',
-  code: 'KeyA'
+  code: 'KeyA',
+  isCapsLocking: true
 }, {
   key: 's',
-  code: 'KeyS'
+  code: 'KeyS',
+  isCapsLocking: true
 }, {
   key: 'd',
-  code: 'KeyD'
+  code: 'KeyD',
+  isCapsLocking: true
 }, {
   key: 'f',
-  code: 'KeyF'
+  code: 'KeyF',
+  isCapsLocking: true
 }, {
   key: 'g',
-  code: 'KeyG'
+  code: 'KeyG',
+  isCapsLocking: true
 }, {
   key: 'h',
-  code: 'KeyH'
+  code: 'KeyH',
+  isCapsLocking: true
 }, {
   key: 'j',
-  code: 'KeyJ'
+  code: 'KeyJ',
+  isCapsLocking: true
 }, {
   key: 'k',
-  code: 'KeyK'
+  code: 'KeyK',
+  isCapsLocking: true
 }, {
   key: 'l',
-  code: 'KeyL'
+  code: 'KeyL',
+  isCapsLocking: true
 }, {
   key: ';',
   code: 'Semicolon'
@@ -426,25 +478,32 @@ __webpack_require__.r(__webpack_exports__);
   className: 'key--2w'
 }, {
   key: 'z',
-  code: 'KeyZ'
+  code: 'KeyZ',
+  isCapsLocking: true
 }, {
   key: 'x',
-  code: 'KeyX'
+  code: 'KeyX',
+  isCapsLocking: true
 }, {
   key: 'c',
-  code: 'KeyC'
+  code: 'KeyC',
+  isCapsLocking: true
 }, {
   key: 'v',
-  code: 'KeyV'
+  code: 'KeyV',
+  isCapsLocking: true
 }, {
   key: 'b',
-  code: 'KeyB'
+  code: 'KeyB',
+  isCapsLocking: true
 }, {
   key: 'n',
-  code: 'KeyN'
+  code: 'KeyN',
+  isCapsLocking: true
 }, {
   key: 'm',
-  code: 'KeyM'
+  code: 'KeyM',
+  isCapsLocking: true
 }, {
   key: ',',
   code: 'Comma'
@@ -512,7 +571,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_sourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "html, body {\n  font-family: \"Roboto Mono\", monospace;\n  font-size: 20px;\n  font-weight: 400;\n  line-height: 1.6;\n  overflow-x: hidden;\n  width: 100%;\n  max-width: 100vw;\n  height: 100%;\n  color: var(--white);\n  scroll-behavior: smooth;\n  margin: 0;\n  padding: 0;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n\n.app {\n  text-align: center;\n}\n\n.entry-field {\n  max-width: 740px;\n  width: 100%;\n  margin-bottom: 15px;\n  margin-top: 50px;\n  resize: none;\n  border-radius: 5px;\n  outline: none;\n  background: #d4d4d4;\n  padding: 8px;\n}\n\n.keyboard {\n  display: inline-flex;\n  flex-direction: column;\n  gap: 8px;\n  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 14.52%, rgba(255, 255, 255, 0) 87.38%), #ccc;\n  box-shadow: 0px 2px 0px #848484;\n  border-radius: 12px;\n  padding: 10px;\n  margin: 0 auto;\n}\n.keyboard__line {\n  display: flex;\n  gap: 8px;\n}\n.key {\n  color: #8c8c8c;\n  font-size: 16px;\n  padding: 5px;\n  cursor: pointer;\n  width: 62px;\n  height: 60px;\n  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%), #e7e7e7;\n  border: 2px solid rgba(0, 0, 0, 0.6);\n  box-shadow: inset 0 3px 1px #fff;\n  border-radius: 6px;\n  transition: all 0.3s;\n}\n.key:hover {\n  background-color: #ccc;\n  box-shadow: none;\n}\n.key:active, .key--active {\n  box-shadow: inset 2px 2px 5px 0 #656565;\n  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%), #e7e7e7;\n}\n.key--2w {\n  width: 129px;\n}\n.key--1-5w {\n  width: 95px;\n}\n.key--whitespace {\n  width: auto;\n  flex-grow: 1;\n}", "",{"version":3,"sources":["webpack://./src/assets/scss/main.scss"],"names":[],"mappings":"AACA;EACE,qCAAA;EAEA,eAAA;EACA,gBAAA;EACA,gBAAA;EACA,kBAAA;EACA,WAAA;EACA,gBAAA;EACA,YAAA;EACA,mBAAA;EACA,uBAAA;EACA,SAAA;EACA,UAAA;EACA,mCAAA;EACA,kCAAA;AADF;;AAQA;EACE,kBAAA;AALF;;AAWA;EACE,gBAAA;EACA,WAAA;EACA,mBAAA;EACA,gBAAA;EACA,YAAA;EACA,kBAAA;EACA,aAAA;EACA,mBAAA;EACA,YAAA;AARF;;AAWA;EACE,oBAAA;EACA,sBAAA;EACA,QAAA;EACA,yGAAA;EACA,+BAAA;EACA,mBAAA;EACA,aAAA;EACA,cAAA;AARF;AAWE;EACE,aAAA;EACA,QAAA;AATJ;AAiBA;EACE,cAAA;EACA,eAAA;EACA,YAAA;EACA,eAAA;EACA,WAAA;EACA,YAAA;EACA,kFAAA;EACA,oCAAA;EACA,gCAAA;EACA,kBAAA;EACA,oBAAA;AAfF;AAkBE;EACE,sBAAA;EACA,gBAAA;AAhBJ;AAoBE;EAEE,uCAAA;EACA,kFAAA;AAnBJ;AAuBE;EACE,YAAA;AArBJ;AAyBE;EACE,WAAA;AAvBJ;AA2BE;EACE,WAAA;EACA,YAAA;AAzBJ","sourcesContent":["\nhtml, body {\n  font-family             : 'Roboto Mono', monospace;\n\n  font-size               : 20px;\n  font-weight             : 400;\n  line-height             : 1.6;\n  overflow-x              : hidden;\n  width                   : 100%;\n  max-width               : 100vw;\n  height                  : 100%;\n  color                   : var(--white);\n  scroll-behavior         : smooth;\n  margin                  : 0;\n  padding                 : 0;\n  -webkit-font-smoothing  : antialiased;\n  -moz-osx-font-smoothing : grayscale;\n\n}\n\n.container {\n}\n\n.app {\n  text-align : center;\n}\n\n.entry-field-wrapper {\n}\n\n.entry-field {\n  max-width     : 740px;\n  width         : 100%;\n  margin-bottom : 15px;\n  margin-top    : 50px;\n  resize        : none;\n  border-radius : 5px;\n  outline       : none;\n  background    : #d4d4d4;\n  padding       : 8px;\n}\n\n.keyboard {\n  display        : inline-flex;\n  flex-direction : column;\n  gap            : 8px;\n  background     : linear-gradient(180deg, #fff3 14.52%, #fff0 87.38%), #ccc;\n  box-shadow     : 0px 2px 0px #848484;\n  border-radius  : 12px;\n  padding        : 10px;\n  margin         : 0 auto;\n\n  // .keyboard__line\n  &__line {\n    display : flex;\n    gap     : 8px;\n  }\n\n  // .keyboard__key\n  &__key {\n  }\n}\n\n.key {\n  color         : #8c8c8c;\n  font-size     : 16px;\n  padding       : 5px;\n  cursor        : pointer;\n  width         : 62px;\n  height        : 60px;\n  background    : linear-gradient(180deg, #fff0 0%, #fff 100%), #e7e7e7;\n  border        : 2px solid #0009;\n  box-shadow    : inset 0 3px 1px #fff;\n  border-radius : 6px;\n  transition: all 0.3s;\n\n\n  &:hover{\n    background-color : #ccc;\n    box-shadow : none;\n  }\n\n  // .key--active\n  &:active,\n  &--active {\n    box-shadow : inset 2px 2px 5px 0 #656565;;\n    background    : linear-gradient(180deg, #fff0 0%, #fff 100%), #e7e7e7;\n  }\n\n  // .key--2w\n  &--2w {\n    width : 129px;\n  }\n\n  // .key--1-5w\n  &--1-5w {\n    width : 95px;\n  }\n\n  // .key--whitespace\n  &--whitespace {\n    width     : auto;\n    flex-grow : 1;\n  }\n}\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "html, body {\n  font-family: \"Roboto Mono\", monospace;\n  font-size: 20px;\n  font-weight: 400;\n  line-height: 1.6;\n  overflow-x: hidden;\n  width: 100%;\n  max-width: 100vw;\n  height: 100%;\n  color: var(--white);\n  scroll-behavior: smooth;\n  margin: 0;\n  padding: 0;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n\n.app {\n  text-align: center;\n}\n\n.entry-field {\n  max-width: 740px;\n  width: 100%;\n  margin-bottom: 15px;\n  margin-top: 50px;\n  resize: none;\n  border-radius: 5px;\n  outline: none;\n  background: #d4d4d4;\n  padding: 8px;\n}\n\n.keyboard {\n  display: inline-flex;\n  flex-direction: column;\n  gap: 8px;\n  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 14.52%, rgba(255, 255, 255, 0) 87.38%), #ccc;\n  box-shadow: 0px 2px 0px #848484;\n  border-radius: 12px;\n  padding: 10px;\n  margin: 30px auto;\n}\n.keyboard__line {\n  display: flex;\n  gap: 8px;\n}\n.key {\n  color: #8c8c8c;\n  font-size: 16px;\n  padding: 5px;\n  cursor: pointer;\n  width: 62px;\n  height: 60px;\n  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%), #e7e7e7;\n  border: 2px solid rgba(0, 0, 0, 0.6);\n  box-shadow: inset 0 3px 1px #fff;\n  border-radius: 6px;\n  transition: all 0.3s;\n}\n.key:hover {\n  background-color: #ccc;\n  box-shadow: none;\n}\n.key:active, .key--active {\n  box-shadow: inset 2px 2px 5px 0 #656565;\n  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #fff 100%), #e7e7e7;\n}\n.key--2w {\n  width: 129px;\n}\n.key--1-5w {\n  width: 95px;\n}\n.key--whitespace {\n  width: auto;\n  flex-grow: 1;\n}", "",{"version":3,"sources":["webpack://./src/assets/scss/main.scss"],"names":[],"mappings":"AACA;EACE,qCAAA;EAEA,eAAA;EACA,gBAAA;EACA,gBAAA;EACA,kBAAA;EACA,WAAA;EACA,gBAAA;EACA,YAAA;EACA,mBAAA;EACA,uBAAA;EACA,SAAA;EACA,UAAA;EACA,mCAAA;EACA,kCAAA;AADF;;AAQA;EACE,kBAAA;AALF;;AAWA;EACE,gBAAA;EACA,WAAA;EACA,mBAAA;EACA,gBAAA;EACA,YAAA;EACA,kBAAA;EACA,aAAA;EACA,mBAAA;EACA,YAAA;AARF;;AAWA;EACE,oBAAA;EACA,sBAAA;EACA,QAAA;EACA,yGAAA;EACA,+BAAA;EACA,mBAAA;EACA,aAAA;EACA,iBAAA;AARF;AAWE;EACE,aAAA;EACA,QAAA;AATJ;AAiBA;EACE,cAAA;EACA,eAAA;EACA,YAAA;EACA,eAAA;EACA,WAAA;EACA,YAAA;EACA,kFAAA;EACA,oCAAA;EACA,gCAAA;EACA,kBAAA;EACA,oBAAA;AAfF;AAkBE;EACE,sBAAA;EACA,gBAAA;AAhBJ;AAoBE;EAEE,uCAAA;EACA,kFAAA;AAnBJ;AAuBE;EACE,YAAA;AArBJ;AAyBE;EACE,WAAA;AAvBJ;AA2BE;EACE,WAAA;EACA,YAAA;AAzBJ","sourcesContent":["\nhtml, body {\n  font-family             : 'Roboto Mono', monospace;\n\n  font-size               : 20px;\n  font-weight             : 400;\n  line-height             : 1.6;\n  overflow-x              : hidden;\n  width                   : 100%;\n  max-width               : 100vw;\n  height                  : 100%;\n  color                   : var(--white);\n  scroll-behavior         : smooth;\n  margin                  : 0;\n  padding                 : 0;\n  -webkit-font-smoothing  : antialiased;\n  -moz-osx-font-smoothing : grayscale;\n\n}\n\n.container {\n}\n\n.app {\n  text-align : center;\n}\n\n.entry-field-wrapper {\n}\n\n.entry-field {\n  max-width     : 740px;\n  width         : 100%;\n  margin-bottom : 15px;\n  margin-top    : 50px;\n  resize        : none;\n  border-radius : 5px;\n  outline       : none;\n  background    : #d4d4d4;\n  padding       : 8px;\n}\n\n.keyboard {\n  display        : inline-flex;\n  flex-direction : column;\n  gap            : 8px;\n  background     : linear-gradient(180deg, #fff3 14.52%, #fff0 87.38%), #ccc;\n  box-shadow     : 0px 2px 0px #848484;\n  border-radius  : 12px;\n  padding        : 10px;\n  margin         : 30px auto;\n\n  // .keyboard__line\n  &__line {\n    display : flex;\n    gap     : 8px;\n  }\n\n  // .keyboard__key\n  &__key {\n  }\n}\n\n.key {\n  color         : #8c8c8c;\n  font-size     : 16px;\n  padding       : 5px;\n  cursor        : pointer;\n  width         : 62px;\n  height        : 60px;\n  background    : linear-gradient(180deg, #fff0 0%, #fff 100%), #e7e7e7;\n  border        : 2px solid #0009;\n  box-shadow    : inset 0 3px 1px #fff;\n  border-radius : 6px;\n  transition: all 0.3s;\n\n\n  &:hover{\n    background-color : #ccc;\n    box-shadow : none;\n  }\n\n  // .key--active\n  &:active,\n  &--active {\n    box-shadow : inset 2px 2px 5px 0 #656565;;\n    background    : linear-gradient(180deg, #fff0 0%, #fff 100%), #e7e7e7;\n  }\n\n  // .key--2w\n  &--2w {\n    width : 129px;\n  }\n\n  // .key--1-5w\n  &--1-5w {\n    width : 95px;\n  }\n\n  // .key--whitespace\n  &--whitespace {\n    width     : auto;\n    flex-grow : 1;\n  }\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -738,4 +797,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=app.24ba534e65120c37686b.js.map
+//# sourceMappingURL=app.6b08bbffd059af294174.js.map
