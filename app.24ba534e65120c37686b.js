@@ -17,143 +17,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const FLAT_KEY_LINES = _assets_js_keys__WEBPACK_IMPORTED_MODULE_2__["default"].flat();
-let ENTRY_FIELD = null;
-
-const printChar = (char, start = ENTRY_FIELD.selectionStart) => {
-  ENTRY_FIELD.value += char;
-};
-
-const pressKeyHandler = keyData => {
-  if (!keyData) {
-    return;
-  }
-
-  const start = ENTRY_FIELD.selectionStart;
-  const {
-    key: char,
-    code: keyCode
-  } = keyData;
-
-  switch (keyCode) {
-    case 'Enter':
-      ENTRY_FIELD.value += '\n';
-      break;
-
-    case 'Tab':
-      ENTRY_FIELD.value += '\t';
-      break;
-
-    case 'Delete':
-      ENTRY_FIELD.value = ENTRY_FIELD.value.slice(0, start) + ENTRY_FIELD.value.slice(start + 1);
-      ENTRY_FIELD.selectionStart = start;
-      ENTRY_FIELD.selectionEnd = start;
-      break;
-
-    case 'Backspace':
-      ENTRY_FIELD.value = ENTRY_FIELD.value.slice(0, start - 1) + ENTRY_FIELD.value.slice(start);
-      ENTRY_FIELD.selectionStart = start - 1;
-      ENTRY_FIELD.selectionEnd = start - 1;
-      break;
-
-    case 'ShiftLeft':
-    case 'ShiftRight':
-      console.log('shift');
-      break;
-
-    case 'ControlLeft':
-    case 'ControlRight':
-      console.log('Control');
-      break;
-
-    default:
-      printChar(char, start);
-  }
-
-  const pressedKey = document.querySelector(`[data-key-code="${keyCode}"]`);
-  pressedKey.classList.add('key--active');
-};
-
-const releaseHandler = keyData => {
-  if (!keyData) {
-    return;
-  }
-
-  const {
-    code: keyCode
-  } = keyData;
-  const pressedKey = document.querySelector(`[data-key-code="${keyCode}"]`);
-  pressedKey.classList.remove('key--active');
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-  const container = document.createElement('div');
-  container.classList.add('container');
-  const app = document.createElement('div');
-  app.classList.add('app');
-  const entryFieldWrapper = document.createElement('div');
-  entryFieldWrapper.classList.add('entry-field-wrapper');
-  const entryField = document.createElement('textarea');
-  entryField.classList.add('entry-field');
-  entryField.cols = 30;
-  entryField.rows = 10;
-  entryFieldWrapper.append(entryField);
-  ENTRY_FIELD = entryField;
-  const keyboard = document.createElement('div');
-  keyboard.classList.add('keyboard');
-  keyboard.append(...(0,_assets_js_keyboard__WEBPACK_IMPORTED_MODULE_3__["default"])(_assets_js_keys__WEBPACK_IMPORTED_MODULE_2__["default"]));
-  const text = document.createElement('div');
-  text.classList.add('text');
-  text.innerHTML = `<br>
-      Клавиатура создана в операционной системе Windows <br>
-      Для переключения языка комбинация: левые shift + ctrl`;
-  app.append(entryFieldWrapper);
-  app.append(keyboard);
-  app.append(text);
-  container.append(app);
-  document.body.append(container);
-});
-document.addEventListener('keydown', evt => {
-  evt.preventDefault();
-  console.log(evt);
-  const {
-    code
-  } = evt;
-  const keyData = FLAT_KEY_LINES.find(k => k.code === code);
-  pressKeyHandler(keyData);
-});
-document.addEventListener('keyup', evt => {
-  evt.preventDefault();
-  const {
-    code
-  } = evt;
-  const keyData = FLAT_KEY_LINES.find(k => k.code === code);
-  releaseHandler(keyData);
-});
-document.addEventListener('mouseKeyDown', evt => {
-  evt.preventDefault();
-  const {
-    detail
-  } = evt;
-  const {
-    code
-  } = detail;
-  const keyData = FLAT_KEY_LINES.find(k => k.code === code);
-  pressKeyHandler(keyData);
-});
-document.addEventListener('mouseKeyUp', evt => {
-  evt.preventDefault();
-  const {
-    detail
-  } = evt;
-  const {
-    code
-  } = detail;
-  const keyData = FLAT_KEY_LINES.find(k => k.code === code);
-  releaseHandler(keyData);
-}); // setInterval(() => {
-//   console.log(ENTRY_FIELD.selectionStart);
-// }, 500);
+const keyboardApp = new _assets_js_keyboard__WEBPACK_IMPORTED_MODULE_3__["default"](_assets_js_keys__WEBPACK_IMPORTED_MODULE_2__["default"]);
+keyboardApp.init();
 
 /***/ }),
 
@@ -165,49 +30,239 @@ document.addEventListener('mouseKeyUp', evt => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ Keyboard)
 /* harmony export */ });
-const renderKey = keyData => {
-  const btn = document.createElement('button');
-  btn.classList.add('keyboard__key', 'key');
-
-  if (keyData.className) {
-    btn.classList.add(keyData.className);
+class Keyboard {
+  constructor(lines) {
+    this.state = {
+      isShiftPressed: false,
+      isCapsLock: false,
+      isEnLang: true
+    };
+    this.entryField = null;
+    this.allKeys = lines.flat();
+    this.allKeyElements = [];
+    this.lines = lines; // setInterval(() => {
+    //   console.log(this.state);
+    // }, 1000);
   }
 
-  btn.type = 'button';
-  btn.dataset.keyCode = keyData.code;
-  btn.textContent = keyData.key;
-  btn.addEventListener('mousedown', () => {
-    const mouseKeyDown = new CustomEvent('mouseKeyDown', {
-      detail: {
-        code: keyData.code
-      }
+  init() {
+    this.render();
+    document.addEventListener('keydown', evt => {
+      evt.preventDefault();
+      const {
+        code
+      } = evt;
+      const keyData = this.allKeys.find(k => k.code === code);
+      this.pressKeyHandler(keyData);
     });
-    document.dispatchEvent(mouseKeyDown);
-  });
-  btn.addEventListener('mouseup', () => {
-    const mouseKeyUp = new CustomEvent('mouseKeyUp', {
-      detail: {
-        code: keyData.code
-      }
+    document.addEventListener('keyup', evt => {
+      evt.preventDefault();
+      const {
+        code
+      } = evt;
+      const keyData = this.allKeys.find(k => k.code === code);
+      this.releaseHandler(keyData);
     });
-    document.dispatchEvent(mouseKeyUp);
-  });
-  return btn;
-};
+    document.addEventListener('mouseKeyDown', evt => {
+      evt.preventDefault();
+      const {
+        detail
+      } = evt;
+      const {
+        code
+      } = detail;
+      const keyData = this.allKeys.find(k => k.code === code);
+      this.pressKeyHandler(keyData);
+    });
+    document.addEventListener('mouseKeyUp', evt => {
+      evt.preventDefault();
+      const {
+        detail
+      } = evt;
+      const {
+        code
+      } = detail;
+      const keyData = this.allKeys.find(k => k.code === code);
+      this.releaseHandler(keyData);
+    });
+  }
 
-const renderKeyLine = line => {
-  const keysLine = document.createElement('div');
-  keysLine.classList.add('keyboard__line');
-  const keys = line.map(key => renderKey(key));
-  keysLine.append(...keys);
-  return keysLine;
-};
+  printChar(char) {
+    this.entryField.value += char;
+  }
 
-const renderKeyLines = lines => lines.map(l => renderKeyLine(l));
+  render() {
+    const container = document.createElement('div');
+    container.classList.add('container');
+    const app = document.createElement('div');
+    app.classList.add('app');
+    const entryFieldWrapper = document.createElement('div');
+    entryFieldWrapper.classList.add('entry-field-wrapper');
+    const entryField = document.createElement('textarea');
+    entryField.classList.add('entry-field');
+    entryField.cols = 30;
+    entryField.rows = 10;
+    entryFieldWrapper.append(entryField);
+    this.entryField = entryField;
+    const keyboard = document.createElement('div');
+    keyboard.classList.add('keyboard');
+    keyboard.append(...this.renderKeyLines(this.keyLines));
+    const text = document.createElement('div');
+    text.classList.add('text');
+    text.innerHTML = `<br>
+      Клавиатура создана в операционной системе Windows <br>
+      Для переключения языка комбинация: левые shift + ctrl`;
+    app.append(entryFieldWrapper);
+    app.append(keyboard);
+    app.append(text);
+    container.append(app);
+    document.body.append(container);
+    return entryField;
+  }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (data => renderKeyLines(data));
+  renderKeyLines() {
+    return this.lines.map(l => this.renderKeyLine(l));
+  }
+
+  renderKeyLine(line) {
+    const keysLine = document.createElement('div');
+    keysLine.classList.add('keyboard__line');
+    const keys = line.map(key => this.renderKey(key));
+    this.allKeyElements = [...this.allKeyElements, ...keys];
+    keysLine.append(...keys);
+    return keysLine;
+  }
+
+  renderKey(keyData) {
+    const btn = document.createElement('button');
+    btn.classList.add('keyboard__key', 'key');
+
+    if (keyData.className) {
+      btn.classList.add(keyData.className);
+    }
+
+    if (this.state.currentKeyCode === keyData.key) {
+      btn.classList.remove('key--active');
+    }
+
+    if (this.state.isCapsLock) {
+      btn.classList.remove('key--active');
+    }
+
+    btn.type = 'button';
+    btn.dataset.keyCode = keyData.code;
+    btn.textContent = keyData.key;
+    btn.addEventListener('mousedown', () => {
+      const mouseKeyDown = new CustomEvent('mouseKeyDown', {
+        detail: {
+          code: keyData.code
+        }
+      });
+      document.dispatchEvent(mouseKeyDown);
+    });
+    btn.addEventListener('mouseup', () => {
+      const mouseKeyUp = new CustomEvent('mouseKeyUp', {
+        detail: {
+          code: keyData.code
+        }
+      });
+      document.dispatchEvent(mouseKeyUp);
+    });
+    return btn;
+  }
+
+  pressKeyHandler(keyData) {
+    if (!keyData) {
+      return;
+    }
+
+    const currentKey = this.allKeyElements.find(key => key.dataset.keyCode === keyData.code);
+    currentKey.classList.add('key--active');
+    const start = this.entryField.selectionStart;
+    const {
+      key: char,
+      code: keyCode
+    } = keyData;
+    let newChar = char;
+
+    if (this.state.isShiftPressed) {
+      newChar = char.toUpperCase();
+    }
+
+    if (this.state.isCapsLock) {
+      newChar = char.toUpperCase();
+    }
+
+    switch (keyCode) {
+      case 'Enter':
+        this.entryField.value += '\n';
+        break;
+
+      case 'Tab':
+        this.entryField.value += '\t';
+        break;
+
+      case 'Delete':
+        this.entryField.focus();
+
+        if (start >= 0 && start <= this.entryField.value.length - 1) {
+          this.entryField.value = this.entryField.value.slice(0, start) + this.entryField.value.slice(start + 1);
+          this.entryField.selectionStart = start;
+          this.entryField.selectionEnd = start;
+        }
+
+        break;
+
+      case 'Backspace':
+        this.entryField.focus();
+
+        if (start >= 0 && start <= this.entryField.value.length) {
+          this.entryField.value = this.entryField.value.slice(0, start - 1) + this.entryField.value.slice(start);
+          this.entryField.selectionStart = start - 1;
+          this.entryField.selectionEnd = start - 1;
+        }
+
+        break;
+
+      case 'ShiftLeft':
+      case 'ShiftRight':
+        this.state.isShiftPressed = true;
+        break;
+
+      case 'AltLeft':
+      case 'AltRight':
+        console.log('alt');
+        break;
+
+      case 'CapsLock':
+        this.state.isCapsLock = !this.state.isCapsLock;
+        break;
+
+      case 'ControlLeft':
+      case 'ControlRight':
+        console.log('Control');
+        break;
+
+      default:
+        this.printChar(newChar);
+    }
+  }
+
+  releaseHandler(keyData) {
+    if (!keyData) {
+      return;
+    }
+
+    const {
+      code: keyCode
+    } = keyData;
+    const pressedKey = document.querySelector(`[data-key-code="${keyCode}"]`);
+    pressedKey.classList.remove('key--active');
+  }
+
+}
 
 /***/ }),
 
@@ -226,40 +281,52 @@ __webpack_require__.r(__webpack_exports__);
   code: 'Backquote'
 }, {
   key: '1',
-  code: 'Digit1'
+  code: 'Digit1',
+  key2: '!'
 }, {
   key: '2',
-  code: 'Digit2'
+  code: 'Digit2',
+  key2: '@'
 }, {
   key: '3',
-  code: 'Digit3'
+  code: 'Digit3',
+  key2: '#'
 }, {
   key: '4',
-  code: 'Digit4'
+  code: 'Digit4',
+  key2: '$'
 }, {
   key: '5',
-  code: 'Digit5'
+  code: 'Digit5',
+  key2: '%'
 }, {
   key: '6',
-  code: 'Digit6'
+  code: 'Digit6',
+  key2: '^'
 }, {
   key: '7',
-  code: 'Digit7'
+  code: 'Digit7',
+  key2: '&'
 }, {
   key: '8',
-  code: 'Digit8'
+  code: 'Digit8',
+  key2: '*'
 }, {
   key: '9',
-  code: 'Digit9'
+  code: 'Digit9',
+  key2: '('
 }, {
   key: '0',
-  code: 'Digit0'
+  code: 'Digit0',
+  key2: ')'
 }, {
   key: '-',
-  code: 'Minus'
+  code: 'Minus',
+  key2: '_'
 }, {
   key: '=',
-  code: 'Equal'
+  code: 'Equal',
+  key2: '+'
 }, {
   key: 'Backspace',
   code: 'Backspace',
@@ -311,7 +378,8 @@ __webpack_require__.r(__webpack_exports__);
 }], [{
   key: 'CapsLock',
   code: 'CapsLock',
-  className: 'key--1-5w'
+  className: 'key--1-5w',
+  isCapsLock: true
 }, {
   key: 'a',
   code: 'KeyA'
@@ -670,4 +738,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=app.cf5f890b97b439c58ac7.js.map
+//# sourceMappingURL=app.24ba534e65120c37686b.js.map
