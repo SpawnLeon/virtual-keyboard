@@ -68,7 +68,7 @@ class Keyboard {
         code
       } = evt;
       const keyData = this.allKeys.find(k => k.code === code);
-      this.releaseHandler(keyData);
+      this.releaseHandler(keyData, evt);
     });
     document.addEventListener('mouseKeyDown', evt => {
       evt.preventDefault();
@@ -90,7 +90,7 @@ class Keyboard {
         code
       } = detail;
       const keyData = this.allKeys.find(k => k.code === code);
-      this.releaseHandler(keyData);
+      this.releaseHandler(keyData, evt);
     });
   }
 
@@ -182,8 +182,7 @@ class Keyboard {
 
     btn.type = 'button';
     btn.dataset.keyCode = keyData.code;
-    const langKey = keyData[this.state.lang]?.key || keyData.key;
-    btn.textContent = langKey;
+    btn.textContent = this.getChar(keyData);
     btn.addEventListener('mousedown', () => {
       const mouseKeyDown = new CustomEvent('mouseKeyDown', {
         detail: {
@@ -214,18 +213,6 @@ class Keyboard {
     const {
       code: keyCode
     } = keyData;
-    const {
-      key: char
-    } = keyData[this.state.lang] || keyData;
-    let newChar = char;
-
-    if (this.state.isShiftPressed) {
-      newChar = char.toUpperCase();
-    }
-
-    if (this.state.isCapsLock) {
-      newChar = char.toUpperCase();
-    }
 
     switch (keyCode) {
       case 'Enter':
@@ -265,6 +252,7 @@ class Keyboard {
           this.renderKeyboard();
         } else {
           this.state.isShiftPressed = true;
+          this.renderKeyboard();
         }
 
         break;
@@ -294,16 +282,29 @@ class Keyboard {
         break;
 
       default:
-        this.printChar(newChar);
+        this.printChar(this.getChar(keyData));
     }
   }
 
-  releaseHandler(keyData) {
+  releaseHandler(keyData, evt) {
     if (!keyData) {
       return;
     }
 
     const currentKey = this.allKeyElements.find(key => key.dataset.keyCode === keyData.code);
+    const {
+      code: keyCode
+    } = keyData;
+
+    switch (keyCode) {
+      case 'ShiftLeft':
+      case 'ShiftRight':
+        this.state.isShiftPressed = false;
+        this.renderKeyboard();
+        break;
+
+      default:
+    }
 
     if (currentKey.customData.code === 'CapsLock') {
       if (!this.state.isCapsLock) {
@@ -312,6 +313,12 @@ class Keyboard {
     } else {
       currentKey.classList.remove('key--active');
     }
+  }
+
+  getChar(keyData) {
+    const charData = keyData[this.state.lang];
+    const char = charData.lower;
+    return char;
   }
 
 }
@@ -330,417 +337,789 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([[{
   eng: {
-    key: '`'
+    caps: '`',
+    lower: '`',
+    upper: '~',
+    shift: '~'
   },
   rus: {
-    key: 'ё'
+    caps: 'Ё',
+    lower: 'ё',
+    upper: 'Ё',
+    shift: 'ё'
   },
-  code: 'Backquote'
+  code: 'Backquote',
+  isShifting: true
 }, {
-  key: '1',
-  code: 'Digit1',
-  key2: '!'
+  eng: {
+    caps: '1',
+    lower: '1',
+    upper: '!',
+    shift: '!'
+  },
+  rus: {
+    caps: '1',
+    lower: '1',
+    upper: '!',
+    shift: '!'
+  },
+  code: 'Digit1'
 }, {
-  key: '2',
-  code: 'Digit2',
-  key2: '@'
+  eng: {
+    caps: '2',
+    lower: '2',
+    upper: '@',
+    shift: '@'
+  },
+  rus: {
+    caps: '2',
+    lower: '2',
+    upper: '"',
+    shift: '"'
+  },
+  code: 'Digit2'
 }, {
-  key: '3',
-  code: 'Digit3',
-  key2: '#'
+  eng: {
+    caps: '3',
+    lower: '3',
+    upper: '#',
+    shift: '#'
+  },
+  rus: {
+    caps: '3',
+    lower: '3',
+    upper: '№',
+    shift: '№'
+  },
+  code: 'Digit3'
 }, {
-  key: '4',
-  code: 'Digit4',
-  key2: '$'
+  eng: {
+    caps: '4',
+    lower: '4',
+    upper: '$',
+    shift: '$'
+  },
+  rus: {
+    caps: '4',
+    lower: '4',
+    upper: ';',
+    shift: ';'
+  },
+  code: 'Digit4'
 }, {
-  key: '5',
-  code: 'Digit5',
-  key2: '%'
+  eng: {
+    caps: '5',
+    lower: '5',
+    upper: '%',
+    shift: '%'
+  },
+  rus: {
+    caps: '5',
+    lower: '5',
+    upper: '%',
+    shift: '%'
+  },
+  code: 'Digit5'
 }, {
-  key: '6',
-  code: 'Digit6',
-  key2: '^'
+  eng: {
+    caps: '6',
+    lower: '6',
+    upper: '^',
+    shift: '^'
+  },
+  rus: {
+    caps: '6',
+    lower: '6',
+    upper: ':',
+    shift: ':'
+  },
+  code: 'Digit6'
 }, {
-  key: '7',
-  code: 'Digit7',
-  key2: '&'
+  eng: {
+    caps: '7',
+    lower: '7',
+    upper: '&',
+    shift: '&'
+  },
+  rus: {
+    caps: '7',
+    lower: '7',
+    upper: '?',
+    shift: '?'
+  },
+  code: 'Digit7'
 }, {
-  key: '8',
-  code: 'Digit8',
-  key2: '*'
+  eng: {
+    caps: '8',
+    lower: '8',
+    upper: '*',
+    shift: '*'
+  },
+  rus: {
+    caps: '8',
+    lower: '8',
+    upper: '*',
+    shift: '*'
+  },
+  code: 'Digit8'
 }, {
-  key: '9',
-  code: 'Digit9',
-  key2: '('
+  eng: {
+    caps: '9',
+    lower: '9',
+    upper: '(',
+    shift: '('
+  },
+  rus: {
+    caps: '9',
+    lower: '9',
+    upper: '(',
+    shift: '('
+  },
+  code: 'Digit9'
 }, {
-  key: '0',
-  code: 'Digit0',
-  key2: ')'
+  eng: {
+    caps: '0',
+    lower: '0',
+    upper: ')',
+    shift: ')'
+  },
+  rus: {
+    caps: '0',
+    lower: '0',
+    upper: ')',
+    shift: ')'
+  },
+  code: 'Digit0'
 }, {
-  key: '-',
-  code: 'Minus',
-  key2: '_'
+  eng: {
+    caps: '-',
+    lower: '-',
+    upper: '_',
+    shift: '_'
+  },
+  rus: {
+    caps: '-',
+    lower: '-',
+    upper: '_',
+    shift: '_'
+  },
+  code: 'Minus'
 }, {
-  key: '=',
-  code: 'Equal',
-  key2: '+'
+  eng: {
+    caps: '=',
+    lower: '=',
+    upper: '+',
+    shift: '+'
+  },
+  rus: {
+    caps: '=',
+    lower: '=',
+    upper: '+',
+    shift: '+'
+  },
+  code: 'Equal'
 }, {
-  key: 'Backspace',
+  eng: {
+    lower: 'Backspace',
+    upper: 'Backspace'
+  },
+  rus: {
+    lower: 'Backspace',
+    upper: 'Backspace'
+  },
   code: 'Backspace',
   className: 'key--2w'
 }], [{
-  key: 'Tab',
+  eng: {
+    lower: 'Tab',
+    upper: 'Tab'
+  },
+  rus: {
+    lower: 'Tab',
+    upper: 'Tab'
+  },
   code: 'Tab',
   className: 'key--1-5w'
 }, {
   eng: {
-    key: 'q'
+    lower: 'q',
+    upper: 'Q'
   },
   rus: {
-    key: 'й'
+    lower: 'й',
+    upper: 'Й'
   },
   code: 'KeyQ',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'w'
+    lower: 'w',
+    upper: 'W'
   },
   rus: {
-    key: 'ц'
+    lower: 'ц',
+    upper: 'Ц'
   },
   code: 'KeyW',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'e'
+    lower: 'e',
+    upper: 'E'
   },
   rus: {
-    key: 'у'
+    lower: 'у',
+    upper: 'У'
   },
   code: 'KeyE',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'r'
+    lower: 'r',
+    upper: 'R'
   },
   rus: {
-    key: 'к'
+    lower: 'к',
+    upper: 'К'
   },
   code: 'KeyR',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 't'
+    lower: 't',
+    upper: 'T'
   },
   rus: {
-    key: 'е'
+    lower: 'е',
+    upper: 'Е'
   },
   code: 'KeyT',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'y'
+    lower: 'y',
+    upper: 'Y'
   },
   rus: {
-    key: 'н'
+    lower: 'н',
+    upper: 'Н'
   },
   code: 'KeyY',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'u'
+    lower: 'u',
+    upper: 'U'
   },
   rus: {
-    key: 'г'
+    lower: 'г',
+    upper: 'Г'
   },
   code: 'KeyU',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'i'
+    lower: 'i',
+    upper: 'I'
   },
   rus: {
-    key: 'ш'
+    lower: 'ш',
+    upper: 'Ш'
   },
   code: 'KeyI',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'o'
+    lower: 'o',
+    upper: 'O'
   },
   rus: {
-    key: 'щ'
+    lower: 'щ',
+    upper: 'Щ'
   },
   code: 'KeyO',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'p'
+    lower: 'p',
+    upper: 'P'
   },
   rus: {
-    key: 'з'
+    lower: 'з',
+    upper: 'З'
   },
   code: 'KeyP',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: '['
+    caps: '[',
+    lower: '[',
+    upper: '{',
+    shift: '{'
   },
   rus: {
-    key: 'х'
+    caps: 'Х',
+    lower: 'х',
+    upper: 'Х',
+    shift: 'х'
   },
   code: 'BracketLeft'
 }, {
   eng: {
-    key: ']'
+    caps: ']',
+    lower: ']',
+    upper: '}',
+    shift: '}'
   },
   rus: {
-    key: 'ъ'
+    caps: 'Ъ',
+    lower: 'ъ',
+    upper: 'Ъ',
+    shift: 'ъ'
   },
   code: 'BracketRight'
 }, {
-  key: 'Delete',
+  eng: {
+    lower: 'Del',
+    upper: 'Del'
+  },
+  rus: {
+    lower: 'Del',
+    upper: 'Del'
+  },
   code: 'Delete',
   className: 'key--1-5w'
 }], [{
-  key: 'CapsLock',
+  eng: {
+    lower: 'CapsLock',
+    upper: 'CapsLock'
+  },
+  rus: {
+    lower: 'CapsLock',
+    upper: 'CapsLock'
+  },
   code: 'CapsLock',
   className: 'key--1-5w',
   isCapsLock: true
 }, {
   eng: {
-    key: 'a'
+    lower: 'a',
+    upper: 'A'
   },
   rus: {
-    key: 'ф'
+    lower: 'ф',
+    upper: 'Ф'
   },
   code: 'KeyA',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 's'
+    lower: 's',
+    upper: 'S'
   },
   rus: {
-    key: 'ы'
+    lower: 'ы',
+    upper: 'Ы'
   },
   code: 'KeyS',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'd'
+    lower: 'd',
+    upper: 'D'
   },
   rus: {
-    key: 'в'
+    lower: 'в',
+    upper: 'В'
   },
   code: 'KeyD',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'f'
+    lower: 'f',
+    upper: 'F'
   },
   rus: {
-    key: 'а'
+    lower: 'а',
+    upper: 'А'
   },
   code: 'KeyF',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'g'
+    lower: 'g',
+    upper: 'G'
   },
   rus: {
-    key: 'п'
+    lower: 'п',
+    upper: 'П'
   },
   code: 'KeyG',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'h'
+    lower: 'h',
+    upper: 'H'
   },
   rus: {
-    key: 'р'
+    lower: 'р',
+    upper: 'Р'
   },
   code: 'KeyH',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'j'
+    lower: 'j',
+    upper: 'J'
   },
   rus: {
-    key: 'о'
+    lower: 'о',
+    upper: 'О'
   },
   code: 'KeyJ',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'k'
+    lower: 'k',
+    upper: 'K'
   },
   rus: {
-    key: 'л'
+    lower: 'л',
+    upper: 'Л'
   },
   code: 'KeyK',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'l'
+    lower: 'l',
+    upper: 'L'
   },
   rus: {
-    key: 'д'
+    lower: 'д',
+    upper: 'Д'
   },
   code: 'KeyL',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: ';'
+    caps: ';',
+    lower: ';',
+    upper: ':',
+    shift: ':'
   },
   rus: {
-    key: 'ж'
+    caps: 'Ж',
+    lower: 'ж',
+    upper: 'Ж',
+    shift: 'ж'
   },
   code: 'Semicolon'
 }, {
   eng: {
-    key: '\''
+    caps: '\'',
+    lower: '\'',
+    upper: '"',
+    shift: '"'
   },
   rus: {
-    key: 'э'
+    caps: 'Э',
+    lower: 'э',
+    upper: 'Э',
+    shift: 'э'
   },
   code: 'Quote'
 }, {
   eng: {
-    key: '\\'
+    caps: '\\',
+    lower: '\\',
+    upper: '|',
+    shift: '|'
   },
   rus: {
-    key: '\\'
+    caps: '\\',
+    lower: '\\',
+    upper: '/',
+    shift: '/'
   },
   code: 'Backslash'
 }, {
-  key: 'Enter',
+  eng: {
+    lower: 'Enter',
+    upper: 'Enter'
+  },
+  rus: {
+    lower: 'Enter',
+    upper: 'Enter'
+  },
   code: 'Enter',
   className: 'key--1-5w'
 }], [{
-  key: 'Shift',
+  eng: {
+    lower: 'Shift',
+    upper: 'Shift'
+  },
+  rus: {
+    lower: 'Shift',
+    upper: 'Shift'
+  },
   code: 'ShiftLeft',
   className: 'key--2w'
 }, {
   eng: {
-    key: 'z'
+    lower: 'z',
+    upper: 'Z'
   },
   rus: {
-    key: 'я'
+    lower: 'я',
+    upper: 'Я'
   },
   code: 'KeyZ',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'x'
+    lower: 'x',
+    upper: 'X'
   },
   rus: {
-    key: 'ч'
+    lower: 'ч',
+    upper: 'Ч'
   },
   code: 'KeyX',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'c'
+    lower: 'c',
+    upper: 'C'
   },
   rus: {
-    key: 'с'
+    lower: 'с',
+    upper: 'С'
   },
   code: 'KeyC',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'v'
+    lower: 'v',
+    upper: 'V'
   },
   rus: {
-    key: 'м'
+    lower: 'м',
+    upper: 'М'
   },
   code: 'KeyV',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'b'
+    lower: 'b',
+    upper: 'B'
   },
   rus: {
-    key: 'и'
+    lower: 'и',
+    upper: 'И'
   },
   code: 'KeyB',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'n'
+    lower: 'n',
+    upper: 'N'
   },
   rus: {
-    key: 'т'
+    lower: 'т',
+    upper: 'Т'
   },
   code: 'KeyN',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: 'm'
+    lower: 'm',
+    upper: 'M'
   },
   rus: {
-    key: 'ь'
+    lower: 'ь',
+    upper: 'Ь'
   },
   code: 'KeyM',
-  isCapsLocking: true
+  isCapsLocking: true,
+  isShifting: true
 }, {
   eng: {
-    key: ','
+    caps: ',',
+    lower: ',',
+    upper: '<',
+    shift: '<'
   },
   rus: {
-    key: 'б'
+    caps: 'Б',
+    lower: 'б',
+    upper: 'Б',
+    shift: 'б'
   },
   code: 'Comma'
 }, {
   eng: {
-    key: '.'
+    caps: '.',
+    lower: '.',
+    upper: '>',
+    shift: '>'
   },
   rus: {
-    key: 'ю'
+    caps: 'Ю',
+    lower: 'ю',
+    upper: 'Ю',
+    shift: 'ю'
   },
   code: 'Period'
 }, {
   eng: {
-    key: '/'
+    caps: '/',
+    lower: '/',
+    upper: '?',
+    shift: '?'
   },
   rus: {
-    key: '.'
+    caps: '.',
+    lower: '.',
+    upper: ',',
+    shift: ','
   },
   code: 'Slash'
 }, {
-  key: '▲',
+  eng: {
+    lower: '▲',
+    upper: '▲'
+  },
+  rus: {
+    lower: '▲',
+    upper: '▲'
+  },
   code: 'ArrowUp'
 }, {
-  key: 'Shift',
+  eng: {
+    lower: 'Shift',
+    upper: 'Shift'
+  },
+  rus: {
+    lower: 'Shift',
+    upper: 'Shift'
+  },
   code: 'ShiftRight',
   className: 'key--2w'
 }], [{
-  key: 'Ctrl',
+  eng: {
+    lower: 'Ctrl',
+    upper: 'Ctrl'
+  },
+  rus: {
+    lower: 'Ctrl',
+    upper: 'Ctrl'
+  },
   code: 'ControlLeft'
 }, {
-  key: 'Win',
+  eng: {
+    lower: 'Win',
+    upper: 'Win'
+  },
+  rus: {
+    lower: 'Win',
+    upper: 'Win'
+  },
   code: 'MetaLeft'
 }, {
-  key: 'Alt',
+  eng: {
+    lower: 'Alt',
+    upper: 'Alt'
+  },
+  rus: {
+    lower: 'Alt',
+    upper: 'Alt'
+  },
   code: 'AltLeft'
 }, {
-  key: ' ',
+  eng: {
+    lower: ' ',
+    upper: ' '
+  },
+  rus: {
+    lower: ' ',
+    upper: ' '
+  },
   code: 'Space',
   className: 'key--whitespace'
 }, {
-  key: 'Alt',
+  eng: {
+    lower: 'Alt',
+    upper: 'Alt'
+  },
+  rus: {
+    lower: 'Alt',
+    upper: 'Alt'
+  },
   code: 'AltRight'
 }, {
-  key: '◄',
+  eng: {
+    lower: '◄',
+    upper: '◄'
+  },
+  rus: {
+    lower: '◄',
+    upper: '◄'
+  },
   code: 'ArrowLeft'
 }, {
-  key: '▼',
+  eng: {
+    lower: '▼',
+    upper: '▼'
+  },
+  rus: {
+    lower: '▼',
+    upper: '▼'
+  },
   code: 'ArrowDown'
 }, {
-  key: '►',
+  eng: {
+    lower: '►',
+    upper: '►'
+  },
+  rus: {
+    lower: '►',
+    upper: '►'
+  },
   code: 'ArrowRight'
 }, {
-  key: 'Ctrl',
+  eng: {
+    lower: 'Ctrl',
+    upper: 'Ctrl'
+  },
+  rus: {
+    lower: 'Ctrl',
+    upper: 'Ctrl'
+  },
   code: 'ControlRight'
 }]]);
 
@@ -991,4 +1370,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=app.8803c979f9e8ca25a200.js.map
+//# sourceMappingURL=app.8ca86a1afb2fe29d073a.js.map
