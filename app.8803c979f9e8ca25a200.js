@@ -17,7 +17,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const keyboardApp = new _assets_js_keyboard__WEBPACK_IMPORTED_MODULE_3__["default"](_assets_js_keys__WEBPACK_IMPORTED_MODULE_2__["default"]);
+const lang = window.localStorage.getItem('lang') || 'eng';
+const keyboardApp = new _assets_js_keyboard__WEBPACK_IMPORTED_MODULE_3__["default"](_assets_js_keys__WEBPACK_IMPORTED_MODULE_2__["default"], lang);
 keyboardApp.init();
 
 /***/ }),
@@ -33,11 +34,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ Keyboard)
 /* harmony export */ });
 class Keyboard {
-  constructor(lines) {
+  constructor(lines, lang) {
     this.state = {
       isShiftPressed: false,
       isCapsLock: false,
-      isEnLang: true
+      lang
     };
     this.entryField = null;
     this.allKeys = lines.flat();
@@ -54,13 +55,12 @@ class Keyboard {
     this.render();
     this.renderKeyboard();
     document.addEventListener('keydown', evt => {
-      console.log(evt);
       evt.preventDefault();
       const {
         code
       } = evt;
       const keyData = this.allKeys.find(k => k.code === code);
-      this.pressKeyHandler(keyData);
+      this.pressKeyHandler(keyData, evt);
     });
     document.addEventListener('keyup', evt => {
       evt.preventDefault();
@@ -92,6 +92,12 @@ class Keyboard {
       const keyData = this.allKeys.find(k => k.code === code);
       this.releaseHandler(keyData);
     });
+  }
+
+  toggleLanguage(evt) {
+    const lang = this.state.lang === 'eng' ? 'rus' : 'eng';
+    this.state.lang = lang;
+    window.localStorage.setItem('lang', lang);
   }
 
   rendersCapslockKeys() {
@@ -176,7 +182,8 @@ class Keyboard {
 
     btn.type = 'button';
     btn.dataset.keyCode = keyData.code;
-    btn.textContent = keyData.key;
+    const langKey = keyData[this.state.lang]?.key || keyData.key;
+    btn.textContent = langKey;
     btn.addEventListener('mousedown', () => {
       const mouseKeyDown = new CustomEvent('mouseKeyDown', {
         detail: {
@@ -196,18 +203,20 @@ class Keyboard {
     return btn;
   }
 
-  pressKeyHandler(keyData) {
+  pressKeyHandler(keyData, evt) {
     if (!keyData) {
       return;
     }
 
+    const start = this.entryField.selectionStart;
     const currentKey = this.allKeyElements.find(key => key.dataset.keyCode === keyData.code);
     currentKey.classList.add('key--active');
-    const start = this.entryField.selectionStart;
     const {
-      key: char,
       code: keyCode
     } = keyData;
+    const {
+      key: char
+    } = keyData[this.state.lang] || keyData;
     let newChar = char;
 
     if (this.state.isShiftPressed) {
@@ -251,7 +260,22 @@ class Keyboard {
 
       case 'ShiftLeft':
       case 'ShiftRight':
-        this.state.isShiftPressed = true;
+        if (evt.ctrlKey && evt.shiftKey) {
+          this.toggleLanguage(evt);
+          this.renderKeyboard();
+        } else {
+          this.state.isShiftPressed = true;
+        }
+
+        break;
+
+      case 'ControlLeft':
+      case 'ControlRight':
+        if (evt.ctrlKey && evt.shiftKey) {
+          this.toggleLanguage(evt);
+          this.renderKeyboard();
+        }
+
         break;
 
       case 'AltLeft':
@@ -267,11 +291,6 @@ class Keyboard {
       case 'CapsLock':
         this.state.isCapsLock = !this.state.isCapsLock;
         this.rendersCapslockKeys();
-        break;
-
-      case 'ControlLeft':
-      case 'ControlRight':
-        console.log('Control');
         break;
 
       default:
@@ -310,7 +329,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ([[{
-  key: '`',
+  eng: {
+    key: '`'
+  },
+  rus: {
+    key: 'ё'
+  },
   code: 'Backquote'
 }, {
   key: '1',
@@ -369,50 +393,110 @@ __webpack_require__.r(__webpack_exports__);
   code: 'Tab',
   className: 'key--1-5w'
 }, {
-  key: 'q',
+  eng: {
+    key: 'q'
+  },
+  rus: {
+    key: 'й'
+  },
   code: 'KeyQ',
   isCapsLocking: true
 }, {
-  key: 'w',
+  eng: {
+    key: 'w'
+  },
+  rus: {
+    key: 'ц'
+  },
   code: 'KeyW',
   isCapsLocking: true
 }, {
-  key: 'e',
+  eng: {
+    key: 'e'
+  },
+  rus: {
+    key: 'у'
+  },
   code: 'KeyE',
   isCapsLocking: true
 }, {
-  key: 'r',
+  eng: {
+    key: 'r'
+  },
+  rus: {
+    key: 'к'
+  },
   code: 'KeyR',
   isCapsLocking: true
 }, {
-  key: 't',
+  eng: {
+    key: 't'
+  },
+  rus: {
+    key: 'е'
+  },
   code: 'KeyT',
   isCapsLocking: true
 }, {
-  key: 'y',
+  eng: {
+    key: 'y'
+  },
+  rus: {
+    key: 'н'
+  },
   code: 'KeyY',
   isCapsLocking: true
 }, {
-  key: 'u',
+  eng: {
+    key: 'u'
+  },
+  rus: {
+    key: 'г'
+  },
   code: 'KeyU',
   isCapsLocking: true
 }, {
-  key: 'i',
+  eng: {
+    key: 'i'
+  },
+  rus: {
+    key: 'ш'
+  },
   code: 'KeyI',
   isCapsLocking: true
 }, {
-  key: 'o',
+  eng: {
+    key: 'o'
+  },
+  rus: {
+    key: 'щ'
+  },
   code: 'KeyO',
   isCapsLocking: true
 }, {
-  key: 'p',
+  eng: {
+    key: 'p'
+  },
+  rus: {
+    key: 'з'
+  },
   code: 'KeyP',
   isCapsLocking: true
 }, {
-  key: '[',
+  eng: {
+    key: '['
+  },
+  rus: {
+    key: 'х'
+  },
   code: 'BracketLeft'
 }, {
-  key: ']',
+  eng: {
+    key: ']'
+  },
+  rus: {
+    key: 'ъ'
+  },
   code: 'BracketRight'
 }, {
   key: 'Delete',
@@ -424,49 +508,109 @@ __webpack_require__.r(__webpack_exports__);
   className: 'key--1-5w',
   isCapsLock: true
 }, {
-  key: 'a',
+  eng: {
+    key: 'a'
+  },
+  rus: {
+    key: 'ф'
+  },
   code: 'KeyA',
   isCapsLocking: true
 }, {
-  key: 's',
+  eng: {
+    key: 's'
+  },
+  rus: {
+    key: 'ы'
+  },
   code: 'KeyS',
   isCapsLocking: true
 }, {
-  key: 'd',
+  eng: {
+    key: 'd'
+  },
+  rus: {
+    key: 'в'
+  },
   code: 'KeyD',
   isCapsLocking: true
 }, {
-  key: 'f',
+  eng: {
+    key: 'f'
+  },
+  rus: {
+    key: 'а'
+  },
   code: 'KeyF',
   isCapsLocking: true
 }, {
-  key: 'g',
+  eng: {
+    key: 'g'
+  },
+  rus: {
+    key: 'п'
+  },
   code: 'KeyG',
   isCapsLocking: true
 }, {
-  key: 'h',
+  eng: {
+    key: 'h'
+  },
+  rus: {
+    key: 'р'
+  },
   code: 'KeyH',
   isCapsLocking: true
 }, {
-  key: 'j',
+  eng: {
+    key: 'j'
+  },
+  rus: {
+    key: 'о'
+  },
   code: 'KeyJ',
   isCapsLocking: true
 }, {
-  key: 'k',
+  eng: {
+    key: 'k'
+  },
+  rus: {
+    key: 'л'
+  },
   code: 'KeyK',
   isCapsLocking: true
 }, {
-  key: 'l',
+  eng: {
+    key: 'l'
+  },
+  rus: {
+    key: 'д'
+  },
   code: 'KeyL',
   isCapsLocking: true
 }, {
-  key: ';',
+  eng: {
+    key: ';'
+  },
+  rus: {
+    key: 'ж'
+  },
   code: 'Semicolon'
 }, {
-  key: '\'',
+  eng: {
+    key: '\''
+  },
+  rus: {
+    key: 'э'
+  },
   code: 'Quote'
 }, {
-  key: '\\',
+  eng: {
+    key: '\\'
+  },
+  rus: {
+    key: '\\'
+  },
   code: 'Backslash'
 }, {
   key: 'Enter',
@@ -477,41 +621,91 @@ __webpack_require__.r(__webpack_exports__);
   code: 'ShiftLeft',
   className: 'key--2w'
 }, {
-  key: 'z',
+  eng: {
+    key: 'z'
+  },
+  rus: {
+    key: 'я'
+  },
   code: 'KeyZ',
   isCapsLocking: true
 }, {
-  key: 'x',
+  eng: {
+    key: 'x'
+  },
+  rus: {
+    key: 'ч'
+  },
   code: 'KeyX',
   isCapsLocking: true
 }, {
-  key: 'c',
+  eng: {
+    key: 'c'
+  },
+  rus: {
+    key: 'с'
+  },
   code: 'KeyC',
   isCapsLocking: true
 }, {
-  key: 'v',
+  eng: {
+    key: 'v'
+  },
+  rus: {
+    key: 'м'
+  },
   code: 'KeyV',
   isCapsLocking: true
 }, {
-  key: 'b',
+  eng: {
+    key: 'b'
+  },
+  rus: {
+    key: 'и'
+  },
   code: 'KeyB',
   isCapsLocking: true
 }, {
-  key: 'n',
+  eng: {
+    key: 'n'
+  },
+  rus: {
+    key: 'т'
+  },
   code: 'KeyN',
   isCapsLocking: true
 }, {
-  key: 'm',
+  eng: {
+    key: 'm'
+  },
+  rus: {
+    key: 'ь'
+  },
   code: 'KeyM',
   isCapsLocking: true
 }, {
-  key: ',',
+  eng: {
+    key: ','
+  },
+  rus: {
+    key: 'б'
+  },
   code: 'Comma'
 }, {
-  key: '.',
+  eng: {
+    key: '.'
+  },
+  rus: {
+    key: 'ю'
+  },
   code: 'Period'
 }, {
-  key: '/',
+  eng: {
+    key: '/'
+  },
+  rus: {
+    key: '.'
+  },
   code: 'Slash'
 }, {
   key: '▲',
@@ -797,4 +991,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=app.6b08bbffd059af294174.js.map
+//# sourceMappingURL=app.8803c979f9e8ca25a200.js.map
