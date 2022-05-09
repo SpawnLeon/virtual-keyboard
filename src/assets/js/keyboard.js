@@ -13,10 +13,6 @@ export default class Keyboard {
     this.elements = {
       keyboardWrapper: null,
     };
-
-    // setInterval(() => {
-    //   console.log(this.state);
-    // }, 1000);
   }
 
   init() {
@@ -35,7 +31,7 @@ export default class Keyboard {
       evt.preventDefault();
       const { code } = evt;
       const keyData = this.allKeys.find((k) => k.code === code);
-      this.releaseHandler(keyData);
+      this.releaseHandler(keyData, evt);
     });
 
     document.addEventListener('mouseKeyDown', (evt) => {
@@ -43,7 +39,7 @@ export default class Keyboard {
       const { detail } = evt;
       const { code } = detail;
       const keyData = this.allKeys.find((k) => k.code === code);
-      this.pressKeyHandler(keyData);
+      this.pressKeyHandler(keyData, evt);
     });
 
     document.addEventListener('mouseKeyUp', (evt) => {
@@ -51,31 +47,19 @@ export default class Keyboard {
       const { detail } = evt;
       const { code } = detail;
       const keyData = this.allKeys.find((k) => k.code === code);
-      this.releaseHandler(keyData);
+      this.releaseHandler(keyData, evt);
     });
   }
 
-  toggleLanguage(evt) {
+  toggleLanguage() {
     const lang = this.state.lang === 'eng' ? 'rus' : 'eng';
     this.state.lang = lang;
     window.localStorage.setItem('lang', lang);
   }
 
-  rendersCapslockKeys() {
-    this.allKeyElements.forEach((element) => {
-      const key = element;
-      if (!key.customData.isCapsLocking) {
-        return;
-      }
-      if (this.state.isCapsLock) {
-        key.textContent = key.textContent.toUpperCase();
-      } else {
-        key.textContent = key.textContent.toLowerCase();
-      }
-    });
-  }
-
   renderKeyboard() {
+    this.allKeyElements = [];
+
     this.elements.keyboardWrapper.innerHTML = '';
     const keyboard = document.createElement('div');
     keyboard.classList.add('keyboard');
@@ -144,30 +128,41 @@ export default class Keyboard {
     btn.customData = keyData;
 
     btn.classList.add('keyboard__key', 'key');
+
     if (keyData.className) {
       btn.classList.add(keyData.className);
+    }
+
+    if (keyData.code === 'CapsLock') {
+      if (this.state.isCapsLock) {
+        btn.classList.add('key--active');
+      } else {
+        btn.classList.remove('key--active');
+      }
     }
 
     btn.type = 'button';
     btn.dataset.keyCode = keyData.code;
 
-    const langKey = keyData[this.state.lang]?.key || keyData.key;
+    btn.textContent = this.getChar(keyData);
 
-    btn.textContent = langKey;
-
-    btn.addEventListener('mousedown', () => {
+    btn.addEventListener('mousedown', (evt) => {
       const mouseKeyDown = new CustomEvent('mouseKeyDown', {
         detail: {
           code: keyData.code,
+          ctrlKey: evt.ctrlKey,
+          shiftKey: evt.shiftKey,
         },
       });
       document.dispatchEvent(mouseKeyDown);
     });
 
-    btn.addEventListener('mouseup', () => {
+    btn.addEventListener('mouseup', (evt) => {
       const mouseKeyUp = new CustomEvent('mouseKeyUp', {
         detail: {
           code: keyData.code,
+          ctrlKey: evt.ctrlKey,
+          shiftKey: evt.shiftKey,
         },
       });
       document.dispatchEvent(mouseKeyUp);
@@ -181,19 +176,7 @@ export default class Keyboard {
 
     const start = this.entryField.selectionStart;
 
-    const currentKey = this.allKeyElements.find((key) => key.dataset.keyCode === keyData.code);
-    currentKey.classList.add('key--active');
-
     const { code: keyCode } = keyData;
-    const { key: char } = keyData[this.state.lang] || keyData;
-
-    let newChar = char;
-    if (this.state.isShiftPressed) {
-      newChar = char.toUpperCase();
-    }
-    if (this.state.isCapsLock) {
-      newChar = char.toUpperCase();
-    }
 
     switch (keyCode) {
       case 'Enter':
@@ -228,6 +211,7 @@ export default class Keyboard {
           this.renderKeyboard();
         } else {
           this.state.isShiftPressed = true;
+          this.renderKeyboard();
         }
 
         break;
@@ -242,21 +226,25 @@ export default class Keyboard {
 
       case 'AltLeft':
       case 'AltRight':
-        console.log('alt');
         break;
 
       case 'MetaLeft':
       case 'MetaRight':
-        console.log('win/meta');
         break;
 
       case 'CapsLock':
         this.state.isCapsLock = !this.state.isCapsLock;
-        this.rendersCapslockKeys();
+        this.renderKeyboard();
         break;
 
       default:
-        this.printChar(newChar);
+        this.printChar(this.getChar(keyData));
+    }
+
+    const currentKey = this.allKeyElements.find((key) => key.dataset.keyCode === keyData.code);
+
+    if (currentKey.customData.code !== 'CapsLock') {
+      currentKey.classList.add('key--active');
     }
   }
 
@@ -264,13 +252,34 @@ export default class Keyboard {
     if (!keyData) { return; }
 
     const currentKey = this.allKeyElements.find((key) => key.dataset.keyCode === keyData.code);
+    const { code: keyCode } = keyData;
 
-    if (currentKey.customData.code === 'CapsLock') {
-      if (!this.state.isCapsLock) {
-        currentKey.classList.remove('key--active');
-      }
-    } else {
+    switch (keyCode) {
+      case 'ShiftLeft':
+      case 'ShiftRight':
+
+        this.state.isShiftPressed = false;
+        this.renderKeyboard();
+
+        break;
+      default:
+    }
+
+    if (currentKey.customData.code !== 'CapsLock') {
       currentKey.classList.remove('key--active');
     }
+  }
+
+  getChar(keyData) {
+    const charData = keyData[this.state.lang];
+    let char = charData.lower;
+    if (this.state.isShiftPressed) {
+      char = charData.upper;
+    }
+    if (this.state.isCapsLock) {
+      char = charData.upper;
+    }
+
+    return char;
   }
 }
