@@ -18,13 +18,18 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const FLAT_KEY_LINES = _assets_js_keys__WEBPACK_IMPORTED_MODULE_2__["default"].flat();
-const ENTRY_FIELD = document.querySelector('.entry-field');
+let ENTRY_FIELD = null;
 
-const printChar = char => {
+const printChar = (char, start = ENTRY_FIELD.selectionStart) => {
   ENTRY_FIELD.value += char;
 };
 
 const pressKeyHandler = keyData => {
+  if (!keyData) {
+    return;
+  }
+
+  const start = ENTRY_FIELD.selectionStart;
   const {
     key: char,
     code: keyCode
@@ -40,11 +45,15 @@ const pressKeyHandler = keyData => {
       break;
 
     case 'Delete':
-      ENTRY_FIELD.value = ENTRY_FIELD.value.slice(0, ENTRY_FIELD.selectionStart) + ENTRY_FIELD.value.slice(ENTRY_FIELD.selectionStart + 1);
+      ENTRY_FIELD.value = ENTRY_FIELD.value.slice(0, start) + ENTRY_FIELD.value.slice(start + 1);
+      ENTRY_FIELD.selectionStart = start;
+      ENTRY_FIELD.selectionEnd = start;
       break;
 
     case 'Backspace':
-      ENTRY_FIELD.value = ENTRY_FIELD.value.slice(0, ENTRY_FIELD.selectionStart - 1) + ENTRY_FIELD.value.slice(ENTRY_FIELD.selectionStart);
+      ENTRY_FIELD.value = ENTRY_FIELD.value.slice(0, start - 1) + ENTRY_FIELD.value.slice(start);
+      ENTRY_FIELD.selectionStart = start - 1;
+      ENTRY_FIELD.selectionEnd = start - 1;
       break;
 
     case 'ShiftLeft':
@@ -52,8 +61,13 @@ const pressKeyHandler = keyData => {
       console.log('shift');
       break;
 
+    case 'ControlLeft':
+    case 'ControlRight':
+      console.log('Control');
+      break;
+
     default:
-      printChar(char);
+      printChar(char, start);
   }
 
   const pressedKey = document.querySelector(`[data-key-code="${keyCode}"]`);
@@ -61,8 +75,11 @@ const pressKeyHandler = keyData => {
 };
 
 const releaseHandler = keyData => {
+  if (!keyData) {
+    return;
+  }
+
   const {
-    key: char,
     code: keyCode
   } = keyData;
   const pressedKey = document.querySelector(`[data-key-code="${keyCode}"]`);
@@ -70,10 +87,35 @@ const releaseHandler = keyData => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelector('.keyboard').append(...(0,_assets_js_keyboard__WEBPACK_IMPORTED_MODULE_3__["default"])(_assets_js_keys__WEBPACK_IMPORTED_MODULE_2__["default"]));
+  const container = document.createElement('div');
+  container.classList.add('container');
+  const app = document.createElement('div');
+  app.classList.add('app');
+  const entryFieldWrapper = document.createElement('div');
+  entryFieldWrapper.classList.add('entry-field-wrapper');
+  const entryField = document.createElement('textarea');
+  entryField.classList.add('entry-field');
+  entryField.cols = 30;
+  entryField.rows = 10;
+  entryFieldWrapper.append(entryField);
+  ENTRY_FIELD = entryField;
+  const keyboard = document.createElement('div');
+  keyboard.classList.add('keyboard');
+  keyboard.append(...(0,_assets_js_keyboard__WEBPACK_IMPORTED_MODULE_3__["default"])(_assets_js_keys__WEBPACK_IMPORTED_MODULE_2__["default"]));
+  const text = document.createElement('div');
+  text.classList.add('text');
+  text.innerHTML = `<br>
+      Клавиатура создана в операционной системе Windows <br>
+      Для переключения языка комбинация: левые shift + ctrl`;
+  app.append(entryFieldWrapper);
+  app.append(keyboard);
+  app.append(text);
+  container.append(app);
+  document.body.append(container);
 });
 document.addEventListener('keydown', evt => {
   evt.preventDefault();
+  console.log(evt);
   const {
     code
   } = evt;
@@ -628,4 +670,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=app.10abbc87bf4c084d1511.js.map
+//# sourceMappingURL=app.cf5f890b97b439c58ac7.js.map
