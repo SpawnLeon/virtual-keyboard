@@ -10,6 +10,10 @@ export default class Keyboard {
     this.allKeyElements = [];
     this.lines = lines;
 
+    this.elements = {
+      keyboardWrapper: null,
+    };
+
     // setInterval(() => {
     //   console.log(this.state);
     // }, 1000);
@@ -17,8 +21,10 @@ export default class Keyboard {
 
   init() {
     this.render();
+    this.renderKeyboard();
 
     document.addEventListener('keydown', (evt) => {
+      console.log(evt);
       evt.preventDefault();
       const { code } = evt;
       const keyData = this.allKeys.find((k) => k.code === code);
@@ -50,6 +56,28 @@ export default class Keyboard {
     });
   }
 
+  rendersCapslockKeys() {
+    this.allKeyElements.forEach((element) => {
+      const key = element;
+      if (!key.customData.isCapsLocking) {
+        return;
+      }
+      if (this.state.isCapsLock) {
+        key.textContent = key.textContent.toUpperCase();
+      } else {
+        key.textContent = key.textContent.toLowerCase();
+      }
+    });
+  }
+
+  renderKeyboard() {
+    this.elements.keyboardWrapper.innerHTML = '';
+    const keyboard = document.createElement('div');
+    keyboard.classList.add('keyboard');
+    keyboard.append(...this.renderKeyLines(this.lines));
+    this.elements.keyboardWrapper.append(keyboard);
+  }
+
   printChar(char) {
     this.entryField.value += char;
   }
@@ -69,25 +97,26 @@ export default class Keyboard {
     entryField.cols = 30;
     entryField.rows = 10;
     entryFieldWrapper.append(entryField);
-
     this.entryField = entryField;
 
-    const keyboard = document.createElement('div');
-    keyboard.classList.add('keyboard');
-
-    keyboard.append(...this.renderKeyLines(this.keyLines));
+    const keyboardWrapper = document.createElement('div');
+    keyboardWrapper.classList.add('keyboard-wrapper');
+    this.elements.keyboardWrapper = keyboardWrapper;
 
     const text = document.createElement('div');
     text.classList.add('text');
-    text.innerHTML = `<br>
+    text.innerHTML = `
       Клавиатура создана в операционной системе Windows <br>
       Для переключения языка комбинация: левые shift + ctrl`;
 
     app.append(entryFieldWrapper);
-    app.append(keyboard);
+
     app.append(text);
+    app.append(keyboardWrapper);
     container.append(app);
     document.body.append(container);
+
+    this.elements.keyboardWrapper = keyboardWrapper;
 
     return entryField;
   }
@@ -107,17 +136,11 @@ export default class Keyboard {
 
   renderKey(keyData) {
     const btn = document.createElement('button');
+    btn.customData = keyData;
+
     btn.classList.add('keyboard__key', 'key');
     if (keyData.className) {
       btn.classList.add(keyData.className);
-    }
-
-    if (this.state.currentKeyCode === keyData.key) {
-      btn.classList.remove('key--active');
-    }
-
-    if (this.state.isCapsLock) {
-      btn.classList.remove('key--active');
     }
 
     btn.type = 'button';
@@ -191,7 +214,6 @@ export default class Keyboard {
       case 'ShiftLeft':
       case 'ShiftRight':
         this.state.isShiftPressed = true;
-
         break;
 
       case 'AltLeft':
@@ -199,8 +221,14 @@ export default class Keyboard {
         console.log('alt');
         break;
 
+      case 'MetaLeft':
+      case 'MetaRight':
+        console.log('win/meta');
+        break;
+
       case 'CapsLock':
         this.state.isCapsLock = !this.state.isCapsLock;
+        this.rendersCapslockKeys();
         break;
       case 'ControlLeft':
       case 'ControlRight':
@@ -213,9 +241,15 @@ export default class Keyboard {
 
   releaseHandler(keyData) {
     if (!keyData) { return; }
-    const { code: keyCode } = keyData;
 
-    const pressedKey = document.querySelector(`[data-key-code="${keyCode}"]`);
-    pressedKey.classList.remove('key--active');
+    const currentKey = this.allKeyElements.find((key) => key.dataset.keyCode === keyData.code);
+
+    if (currentKey.customData.code === 'CapsLock') {
+      if (!this.state.isCapsLock) {
+        currentKey.classList.remove('key--active');
+      }
+    } else {
+      currentKey.classList.remove('key--active');
+    }
   }
 }
