@@ -313,11 +313,11 @@ class Keyboard {
     let char = charData.lower;
 
     if (this.state.isShiftPressed) {
-      char = charData.upper;
+      char = charData.shift ? charData.shift : charData.upper;
     }
 
     if (this.state.isCapsLock) {
-      char = charData.upper;
+      char = charData.caps ? charData.caps : charData.upper;
     }
 
     return char;
@@ -1372,4 +1372,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=app.6840efb39459dd02ebc5.js.map
+//# sourceMappingURL=app.a4f94b8863766d43cfab.js.map
