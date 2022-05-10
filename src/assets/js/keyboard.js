@@ -274,10 +274,10 @@ export default class Keyboard {
     const charData = keyData[this.state.lang];
     let char = charData.lower;
     if (this.state.isShiftPressed) {
-      char = charData.upper;
+      char = charData.shift ? charData.shift : charData.upper;
     }
     if (this.state.isCapsLock) {
-      char = charData.upper;
+      char = charData.caps ? charData.caps : charData.upper;
     }
 
     return char;
